@@ -43,10 +43,10 @@ test('User can sign up, log in and log out successfully', async ({ page }) => {
   await page.getByRole('link', { name: 'Log in' }).click();
 
   // 7. Enter a valid registered username in the username input field
-  await page.getByLabel('Username:').fill(username);
+  await page.locator('#loginusername').fill(username);
 
   // 8. Enter a valid registered password in the password input field
-  await page.getByLabel('Password:').fill(password);
+  await page.locator('#loginpassword').fill(password);
 
   // 9. Click "Log in" in modal
   await page.getByRole('button', { name: 'Log in' }).click();
@@ -261,4 +261,102 @@ test('User can close modals (Login, Sign up, About us, Place Order)', async ({pa
   await page.locator('#orderModal .modal-footer button').first().click();
 
   await expect(page.locator('#orderModal .modal-content')).not.toBeVisible();
+});
+
+test('Navbar and footer are visible on product page', async ({page}) => {
+  // 1. Navigate to any page (click product)
+  await page.locator('.card-title a').first().click();
+
+  // 2. Verify navbar visibility
+  await expect(page.locator('.navbar')).toBeVisible();
+
+  // 3. Verify footer visibility
+  await expect(page.locator('footer')).toBeVisible();
+});
+
+test('Login with non-registered user', async ({page}) => {
+  // 1. Click on "Log in" in navbar
+  await page.getByRole('link', { name: 'Log in' }).click();
+
+  // 2. Enter a non-valid username in the username input field
+  await page.locator('#loginusername').fill('neregistrovaniuser');
+
+  // 3. Enter a non-valid password in the password input field
+  await page.locator('#loginpassword').fill('neregistrovaniuser123');
+
+  // 4. Click "Log in" in modal
+  await page.getByRole('button', { name: 'Log in' }).click();
+
+  // 5. Verify that you cannot login
+    page.on('dialog', async dialog => {
+    expect(dialog.message()).toBe('User does not exist.');
+  })
+});
+
+test('Sign up with registered user', async ({page}) => {
+  // 1. Click on "Sign up" button in navbar
+  await page.getByRole('link', { name: 'Sign up' }).click();
+
+  // 2. Enter a valid username in the username field
+  await page.getByLabel('Username:').fill('test');
+
+  // 3. Enter a valid password in the password field
+  await page.getByLabel('Password:').fill('test');
+
+  // 4. Expect error message popup after clicking Sign up
+  page.on('dialog', async dialog => {
+    expect(dialog.message()).toBe('This user already exist.');
+  })
+});
+
+test('Place Order button state when cart is empty', async ({page}) => {
+  // 1. Click "Cart" from navbar
+  await page.locator('#cartur').click();
+
+  // 2. Expect to have in URL "cart.html"
+  expect(page.url()).toContain('/cart.html');
+
+  // 3. Check total
+  await expect(page.locator('#totalp')).toBeEmpty();
+
+  // 4. Expect that "Place Order" button is disabled
+  expect (page.getByRole('button', { name: 'Place Order' })).toBeDisabled(); 
+});
+
+test('Submit Contact form with invalid or incomplete data', async ({page}) => {
+  // 1. Click on "Contact" in navbar
+  await page.getByRole('link', { name: 'Contact' }).click();
+
+  // 2. Left contact form fields empty
+
+  // 3. "Send message" button is disabled
+  expect(page.getByRole('button', { name: 'Send message' })).toBeDisabled();
+});
+
+test('User cannot register with invalid username and too short password', async ({page}) => {
+  // 1. Click on "Sign up" button in navbar
+  await page.getByRole('link', { name: 'Sign up' }).click();
+
+  // 2. Enter a non-valid username in the username field
+  await page.getByLabel('Username:').fill('test je ovo');
+
+  // 3. Enter a non-valid password in the password field
+  await page.getByLabel('Password:').fill('123');
+
+  // 4. "Sign up" button is disabled due invalid data
+  expect(page.getByRole('button', { name: 'Sign up' })).toBeDisabled();
+});
+
+test('User cannot register with password containing only spaces', async ({page}) => {
+  // 1. Click on "Sign up" button in navbar
+  await page.getByRole('link', { name: 'Sign up' }).click();
+
+  // 2. Enter a non-valid username in the username field
+  await page.getByLabel('test200002').fill('test je ovo');
+
+  // 3. Enter only spaces password in the password field
+  await page.getByLabel('Password:').fill('    ');
+
+  // 4. "Sign up" button is disabled due invalid data
+  expect(page.getByRole('button', { name: 'Sign up' })).toBeDisabled();
 });
