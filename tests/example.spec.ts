@@ -178,3 +178,87 @@ test('User can navigate through homepage slider images successfully', async ({pa
   const secondSlide = await page.locator('.carousel-item.active img').getAttribute('src');
   expect(secondSlide).not.toBe(firstSlide);
 });
+
+test('User can navigate through products using Next and Previous buttons in home page', async ({page}) => {
+  await page.waitForSelector('.card-title a');
+  
+  const firstPageProducts = await page.locator('.card-title a').allTextContents();
+
+  // 1. Click "Next" button for pagination
+  await page.locator('#next2').click();
+
+  await page.waitForTimeout(1000);
+
+  // 2. Products are not same like in first page products
+  const secondPageProducts = await page.locator('.card-title a').allTextContents();
+  expect(secondPageProducts).not.toEqual(firstPageProducts);
+
+  // 3. Click "Previous" button for pagination
+  await page.locator('#prev2').click();
+  await page.waitForTimeout(1000);
+  const returnedProducts = await page.locator('.card-title a').allTextContents();
+
+  // 4. Returning back to first page
+  expect(returnedProducts).toEqual(firstPageProducts);
+});
+
+test('User can close modals (Login, Sign up, About us, Place Order)', async ({page}) => {
+  // 1. Click on "Log in" in navbar
+  await page.locator('#login2').click();
+  
+  // 2. Click "X" icon on the top-right corner of the modal
+  await page.locator('#logInModal .modal-header button').click();
+
+  await expect(page.locator('#logInModal .modal-content')).not.toBeVisible();
+
+  // 3. Click on "Log in" in navbar
+  await page.locator('#login2').click();
+
+  // 4. Click "Close" button in login modal
+  await page.locator('#logInModal .modal-footer button').first().click();
+
+  await expect(page.locator('#logInModal .modal-content')).not.toBeVisible();
+
+  // 5. Click on "Sign up" in navbar
+  await page.locator('#signin2').click();
+
+  // 6. Click "X" icon on the top-right corner of the modal
+  await page.locator('#signInModal .modal-header button').click();
+
+  await expect(page.locator('#signInModal .modal-content')).not.toBeVisible();
+
+  // 5. Click on "Sign up" in navbar
+  await page.locator('#signin2').click();
+
+  // 7. Click "Close" button in sign in modal
+  await page.locator('#signInModal .modal-footer button').first().click();
+
+  await expect(page.locator('#signInModal .modal-content')).not.toBeVisible();
+
+  // 8. Click on "About us" in navbar
+  await page.getByRole('link', { name: 'About us' }).click();
+
+  // 9. Click "X" icon on the top-right corner of the modal
+  await page.locator('#videoModal .modal-header button').click();
+
+  await expect(page.locator('#videoModal .modal-content')).not.toBeVisible();
+
+  // 10. Click on "Cart" in navbar
+  await page.getByRole('link', { name: 'Cart' }).click();
+
+  // 11. Click on "Place Order" in navbar
+  await page.getByRole('button', { name: 'Place Order' }).click();
+
+  // 12. Click "X" icon on the top-right corner of the modal
+  await page.locator('#orderModal .modal-header button').click();
+
+  await expect(page.locator('#orderModal .modal-content')).not.toBeVisible();
+
+  // 13. Click on "Place Order" in navbar
+  await page.getByRole('button', { name: 'Place Order' }).click();
+
+  // 14. Click "Close" button in order modal
+  await page.locator('#orderModal .modal-footer button').first().click();
+
+  await expect(page.locator('#orderModal .modal-content')).not.toBeVisible();
+});
