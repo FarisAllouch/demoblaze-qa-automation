@@ -27,17 +27,23 @@ export default defineConfig({
   use: {
       baseURL: 'https://www.demoblaze.com',
       trace: 'on-first-retry',
-      storageState: 'playwright/.auth/user.json'
   },
 
   /* Configure projects for major browsers */
   projects: [
     {
+      name: 'setup',
+      testMatch: /auth\.setup\.spec\.ts/
+    },
+
+    {
       name: 'chrome',
       use: {
         ...devices['Desktop Chrome'],
         channel: 'chrome',
+        storageState: 'playwright/.auth/user.json'
       },
+      dependencies: ['setup'],
     },
   ],
 
