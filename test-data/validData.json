@@ -1,0 +1,16 @@
+{
+    "validOrder": {
+        "name": "Faris",
+        "country": "Bosnia",
+        "city": "Sarajevo",
+        "card": "123456789",
+        "month": "6",
+        "year": "2026"
+    },
+
+    "contactInfo": {
+        "email": "faris@gmail.com",
+        "name": "Faris Allouch",
+        "message": "test"
+    }
+}
